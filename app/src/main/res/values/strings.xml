@@ -10,4 +10,5 @@
     <string name="label_custom_media_content_view_notification">Show custom media content view notifications</string>
     <string name="label_heads_up_notification">Show heads up notification</string>
     <string name="label_heads_up_custom_layout_notification">Show custom layout heads up notification</string>
+    <string name="todo">TODO</string>
 </resources>
