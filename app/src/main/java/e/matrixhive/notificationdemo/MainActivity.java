@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Notification.Builder createNotificationBuider(String title,String message) {
         return new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true);
