@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -27,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String KEY_PRESSED_ACTION = "KEY_PRESSED_ACTION";
     public static final String KEY_TEXT_REPLY = "KEY_TEXT_REPLY";
     private static final String KEY_NOTIFICATION_GROUP = "KEY_NOTIFICATION_GROUP";
-    private String channelId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +38,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button notiBundled = findViewById(R.id.button_bundled_notification);
         Button notiRemoteInput = findViewById(R.id.button_remote_input_notification);
         Button notiCustomContentView = findViewById(R.id.button_custom_content_view_notification);
+        Button notiCustomContentBigView = findViewById(R.id.button_custom_content_big_view_notification);
+        Button notiCustomBigNormalContentView = findViewById(R.id.button_custom_normal_and_big_content_views_notification);
+        Button notiCustomMediaContentView = findViewById(R.id.button_custom_media_content_view_notification);
+        Button notiHeadsUp = findViewById(R.id.button_heads_up_notification);
+        Button notiCustomHeadsUp = findViewById(R.id.button_custom_layout_heads_up_notification);
 
         notiStandard.setOnClickListener(this);
         notiBundled.setOnClickListener(this);
         notiRemoteInput.setOnClickListener(this);
         notiCustomContentView.setOnClickListener(this);
+        notiCustomContentBigView.setOnClickListener(this);
+        notiCustomBigNormalContentView.setOnClickListener(this);
+        notiCustomMediaContentView.setOnClickListener(this);
+        notiHeadsUp.setOnClickListener(this);
+        notiCustomHeadsUp.setOnClickListener(this);
     }
 
     @Override
@@ -63,34 +73,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.button_custom_content_view_notification:
                 viewCustomContentView();
                 break;
+
+            case R.id.button_custom_content_big_view_notification:
+                viewCustomBigContentView();
+                break;
+
+            case R.id.button_custom_normal_and_big_content_views_notification:
+                viewCustomBothContentView();
+                break;
+
+            case R.id.button_custom_media_content_view_notification:
+                viewCustomMediaContentView();
+                break;
+
+            case R.id.button_heads_up_notification:
+                viewHeadsUp();
+                break;
+
+            case R.id.button_custom_layout_heads_up_notification:
+                viewCustomHeadsUp();
+                break;
         }
-    }
-
-    private void viewCustomContentView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content, R.drawable.ic_phonelink_ring_black_24dp,
-                    R.drawable.ic_priority_high_black_24dp);
-
-            Notification.Builder builder = createCustomNotificationBuilder();
-            builder.setCustomContentView(remoteViews)
-                    .setStyle(new Notification.DecoratedCustomViewStyle());
-            showNotification(builder.build(), 0);
-        }
-    }
-
-    private Notification.Builder createCustomNotificationBuilder() {
-        return new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_phonelink_ring_black_24dp)
-                .setAutoCancel(true);
-    }
-
-    private RemoteViews createRemoteViews(int layout, int iconResource, int imageResource) {
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), layout);
-        remoteViews.setImageViewResource(R.id.image_icon, iconResource);
-        remoteViews.setTextViewText(R.id.text_title, "Custom notification");
-        remoteViews.setTextViewText(R.id.text_message, "This is a custom layout");
-        remoteViews.setImageViewResource(R.id.image_end, imageResource);
-        return remoteViews;
     }
 
     /**
@@ -107,13 +110,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void viewBundleNotification() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT_WATCH) {
+
+            PendingIntent replyIntent = PendingIntent.getActivity(this,
+                    REPLY_INTENT_ID,
+                    getMessageReplyIntent(LABEL_REPLY),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
             PendingIntent archiveIntent = PendingIntent.getActivity(this,
                     ARCHIVE_INTENT_ID,
                     getMessageReplyIntent(LABEL_ARCHIVE),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
-                    LABEL_REPLY, archiveIntent)
+                    LABEL_REPLY, replyIntent)
                     .build();
 
             NotificationCompat.Action archiveAction =
@@ -183,6 +192,159 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /**
+     * show custom content view
+     */
+    private void viewCustomContentView() {
+        RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content, R.drawable.ic_phonelink_ring_black_24dp,
+                "Custom notification", "This is a custom layout",R.drawable.ic_priority_high_black_24dp);
+
+        Notification.Builder builder = createCustomNotificationBuilder();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setCustomContentView(remoteViews)
+                    .setStyle(new Notification.DecoratedCustomViewStyle());
+            showNotification(builder.build(), 0);
+        }
+    }
+
+    /**
+     * show custome big content view
+     */
+    private void viewCustomBigContentView() {
+        RemoteViews remoteViews = createRemoteViews(
+                R.layout.notification_custom_big_content, R.drawable.ic_phonelink_ring_black_24dp,
+                "Custom notification", "This one is a little bigger!",
+                R.drawable.ic_priority_high_black_24dp);
+
+        Notification.Builder builder = createCustomNotificationBuilder();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setCustomBigContentView(remoteViews)
+                    .setStyle(new Notification.DecoratedCustomViewStyle());
+            showNotification(builder.build(), 0);
+        }
+
+    }
+
+    /**
+     * show big and normal content view
+     */
+    private void viewCustomBothContentView() {
+        RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content,
+                R.drawable.ic_phonelink_ring_black_24dp, "Custom notification",
+                "This is a custom layout", R.drawable.ic_priority_high_black_24dp);
+
+        RemoteViews bigRemoteView = createRemoteViews(R.layout.notification_custom_big_content, R.drawable.ic_phonelink_ring_black_24dp,
+                "Custom notification", "This one is a little bigger",
+                R.drawable.ic_priority_high_black_24dp);
+
+        Notification.Builder builder = createCustomNotificationBuilder();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setCustomContentView(remoteViews)
+                    .setCustomBigContentView(bigRemoteView)
+                    .setStyle(new Notification.DecoratedCustomViewStyle());
+            showNotification(builder.build(), 0);
+        }
+    }
+
+    /**
+     * show media content view
+     */
+    private void viewCustomMediaContentView() {
+        RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content,
+                R.drawable.ic_phonelink_ring_black_24dp, "Custom media notification",
+                "This is a custom media layout", R.drawable.ic_play_arrow_black_24dp);
+
+        Notification.Builder builder = createCustomNotificationBuilder();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setCustomContentView(remoteViews)
+                    .setStyle(new Notification.DecoratedMediaCustomViewStyle());
+            showNotification(builder.build(), 0);
+        }
+
+    }
+
+    /**
+     * show heads Up
+     */
+    private void viewHeadsUp() {
+        PendingIntent archiveIntent = PendingIntent.getActivity(this,
+                ARCHIVE_INTENT_ID,
+                getMessageReplyIntent(LABEL_ARCHIVE), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action replyAction =
+                new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
+                        LABEL_REPLY, archiveIntent)
+                        .build();
+        NotificationCompat.Action archiveAction =
+                new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
+                        LABEL_ARCHIVE, archiveIntent)
+                        .build();
+
+        NotificationCompat.Builder notificationBuider = createNotificationBuider( "Heads up!",
+                "This is a normal heads up notification");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            notificationBuider.setPriority(Notification.PRIORITY_HIGH).setVibrate(new long[0]);
+        }
+        notificationBuider.addAction(replyAction);
+        notificationBuider.addAction(archiveAction);
+
+        Intent push = new Intent();
+        push.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        push.setClass(this,MainActivity.class);
+
+        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(this, 0,
+                push, PendingIntent.FLAG_CANCEL_CURRENT);
+        notificationBuider.setFullScreenIntent(fullScreenPendingIntent, true);
+        showNotification(notificationBuider.build(), 0);
+    }
+
+    /**
+     * show custom Heads UP
+     */
+    private void viewCustomHeadsUp() {
+        RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content, R.drawable.ic_phonelink_ring_black_24dp,
+                "Heads up!", "This is a custom heads-up notification",
+                R.drawable.ic_priority_high_black_24dp);
+
+        Intent notificationIntent = new Intent(Intent.ACTION_VIEW);
+        notificationIntent.setData(Uri.parse("http://www.hitherejoe.com"));
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification.Builder builder = createCustomNotificationBuilder();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setCustomContentView(remoteViews)
+                    .setStyle(new Notification.DecoratedCustomViewStyle())
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setVibrate(new long[0])
+                    .setContentIntent(contentIntent);
+
+            Intent push = new Intent();
+            push.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            push.setClass(this, MainActivity.class);
+
+            PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(this, 0,
+                    push, PendingIntent.FLAG_CANCEL_CURRENT);
+            builder.setFullScreenIntent(fullScreenPendingIntent, true);
+            showNotification(builder.build(), 0);
+        }
+
+    }
+
+    private Notification.Builder createCustomNotificationBuilder() {
+        return new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_phonelink_ring_black_24dp)
+                .setAutoCancel(true);
+    }
+
+    private RemoteViews createRemoteViews(int layout, int iconResource,String title, String message, int imageResource) {
+        RemoteViews remoteViews = new RemoteViews(getPackageName(), layout);
+        remoteViews.setImageViewResource(R.id.image_icon, iconResource);
+        remoteViews.setTextViewText(R.id.text_title, title);
+        remoteViews.setTextViewText(R.id.text_message, message);
+        remoteViews.setImageViewResource(R.id.image_end, imageResource);
+        return remoteViews;
+    }
+
     private Intent getMessageReplyIntent(String label) {
         return new Intent()
                 .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
@@ -199,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private NotificationCompat.Builder createNotificationBuider(String title, String message) {
-        return new NotificationCompat.Builder(this, channelId)
+        return new NotificationCompat.Builder(this, "channelId")
                 .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
                 .setContentTitle(title)
                 .setContentText(message)
