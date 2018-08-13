@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RemoteViews;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     public static final int REPLY_INTENT_ID = 0;
     public static final int ARCHIVE_INTENT_ID = 1;
@@ -112,8 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * show bundle
      */
     private void viewBundleNotification() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT_WATCH) {
-
             PendingIntent replyIntent = PendingIntent.getActivity(this,
                     REPLY_INTENT_ID,
                     getMessageReplyIntent(LABEL_REPLY),
@@ -151,44 +149,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showNotification(second.build(), 1);
             showNotification(third.build(), 2);
             showNotification(fourth.build(), 3);
-        }
+
     }
 
     /**
      * Show direct reply
      */
     private void viewRemoteInputNotification() {
-        RemoteInput remoteInput = new RemoteInput.Builder(KEY_TEXT_REPLY)
-                .setLabel(this.getString(R.string.app_name))
-                .build();
+            RemoteInput remoteInput = new RemoteInput.Builder(KEY_TEXT_REPLY)
+                    .setLabel(this.getString(R.string.app_name))
+                    .build();
 
-        PendingIntent replyIntent = PendingIntent.getActivity(this,
-                REPLY_INTENT_ID,
-                getMessageReplyIntent(LABEL_REPLY),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent replyIntent = PendingIntent.getActivity(this,
+                    REPLY_INTENT_ID,
+                    getMessageReplyIntent(LABEL_REPLY),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent archiveIntent = PendingIntent.getActivity(this,
-                ARCHIVE_INTENT_ID,
-                getMessageReplyIntent(LABEL_ARCHIVE),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent archiveIntent = PendingIntent.getActivity(this,
+                    ARCHIVE_INTENT_ID,
+                    getMessageReplyIntent(LABEL_ARCHIVE),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Action replyAction =
-                new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
-                        LABEL_REPLY, replyIntent)
-                        .addRemoteInput(remoteInput)
-                        .build();
+            NotificationCompat.Action replyAction =
+                    new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
+                            LABEL_REPLY, replyIntent)
+                            .addRemoteInput(remoteInput)
+                            .build();
 
-        NotificationCompat.Action archiveAction =
-                new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
-                        LABEL_ARCHIVE, archiveIntent)
-                        .build();
+            NotificationCompat.Action archiveAction =
+                    new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
+                            LABEL_ARCHIVE, archiveIntent)
+                            .build();
 
-        NotificationCompat.Builder builder =
-                createNotificationBuider("Remote input", "Try typing some text!");
-        builder.addAction(replyAction);
-        builder.addAction(archiveAction);
+            NotificationCompat.Builder builder =
+                    createNotificationBuider("Remote input", "Try typing some text!");
+            builder.addAction(replyAction);
+            builder.addAction(archiveAction);
 
-        showNotification(builder.build(), REMOTE_INPUT_ID);
+            showNotification(builder.build(), REMOTE_INPUT_ID);
+
     }
 
     /**
@@ -196,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void viewCustomContentView() {
         RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content, R.drawable.ic_phonelink_ring_black_24dp,
-                "Custom notification", "This is a custom layout", R.drawable.ic_priority_high_black_24dp);
+                "Custom notification", "This is a custom layout",R.drawable.ic_priority_high_black_24dp);
 
         Notification.Builder builder = createCustomNotificationBuilder();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -279,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         LABEL_ARCHIVE, archiveIntent)
                         .build();
 
-        NotificationCompat.Builder notificationBuider = createNotificationBuider("Heads up!",
+        NotificationCompat.Builder notificationBuider = createNotificationBuider( "Heads up!",
                 "This is a normal heads up notification");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             notificationBuider.setPriority(Notification.PRIORITY_HIGH).setVibrate(new long[0]);
@@ -289,11 +288,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Intent push = new Intent();
         push.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        push.setClass(this, MainActivity.class);
+        push.setClass(this,MainActivity.class);
 
         PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(this, 0,
                 push, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuider.setFullScreenIntent(fullScreenPendingIntent, true);
+
         showNotification(notificationBuider.build(), 0);
     }
 
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setAutoCancel(true);
     }
 
-    private RemoteViews createRemoteViews(int layout, int iconResource, String title, String message, int imageResource) {
+    private RemoteViews createRemoteViews(int layout, int iconResource,String title, String message, int imageResource) {
         RemoteViews remoteViews = new RemoteViews(getPackageName(), layout);
         remoteViews.setImageViewResource(R.id.image_icon, iconResource);
         remoteViews.setTextViewText(R.id.text_title, title);
