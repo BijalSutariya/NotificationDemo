@@ -3,11 +3,12 @@ package e.matrixhive.notificationdemo;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.RemoteInput;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.RemoteInput;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String KEY_PRESSED_ACTION = "KEY_PRESSED_ACTION";
     public static final String KEY_TEXT_REPLY = "KEY_TEXT_REPLY";
     private static final String KEY_NOTIFICATION_GROUP = "KEY_NOTIFICATION_GROUP";
+    private String channelId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void viewCustomContentView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             RemoteViews remoteViews = createRemoteViews(R.layout.notification_custom_content, R.drawable.ic_phonelink_ring_black_24dp,
-                    "Custom notification", "This is a custom layout",
                     R.drawable.ic_priority_high_black_24dp);
+
             Notification.Builder builder = createCustomNotificationBuilder();
-            builder.setCustomContentView(remoteViews).setStyle(new Notification.DecoratedCustomViewStyle());
-            showNotification(builder, 0);
+            builder.setCustomContentView(remoteViews)
+                    .setStyle(new Notification.DecoratedCustomViewStyle());
+            showNotification(builder.build(), 0);
         }
     }
 
@@ -81,13 +84,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setAutoCancel(true);
     }
 
-    private RemoteViews createRemoteViews( int layout, int iconResource,
-                                           String title, String message, int imageResource) {
-
-        RemoteViews remoteViews = new RemoteViews(this.getPackageName(), layout);
+    private RemoteViews createRemoteViews(int layout, int iconResource, int imageResource) {
+        RemoteViews remoteViews = new RemoteViews(getPackageName(), layout);
         remoteViews.setImageViewResource(R.id.image_icon, iconResource);
-        remoteViews.setTextViewText(R.id.text_title, title);
-        remoteViews.setTextViewText(R.id.text_message, message);
+        remoteViews.setTextViewText(R.id.text_title, "Custom notification");
+        remoteViews.setTextViewText(R.id.text_message, "This is a custom layout");
         remoteViews.setImageViewResource(R.id.image_end, imageResource);
         return remoteViews;
     }
@@ -96,9 +97,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * show standard
      */
     private void viewStandardNotification() {
-        Notification.Builder notification = createNotificationBuider(
+        NotificationCompat.Builder notification = createNotificationBuider(
                 "Standard Notification", "This is just a standard notification!");
-        showNotification(notification, 0);
+        showNotification(notification.build(), 0);
     }
 
     /**
@@ -111,33 +112,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     getMessageReplyIntent(LABEL_ARCHIVE),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification.Action replyAction = new Notification.Action.Builder(android.R.drawable.sym_def_app_icon,
+            NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
                     LABEL_REPLY, archiveIntent)
                     .build();
 
-            Notification.Action archiveAction =
-                    new Notification.Action.Builder(android.R.drawable.sym_def_app_icon,
+            NotificationCompat.Action archiveAction =
+                    new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
                             LABEL_ARCHIVE, archiveIntent)
                             .build();
 
-            Notification.Builder first = createNotificationBuider("First notification", "This is the first bundled notification");
+            NotificationCompat.Builder first = createNotificationBuider("First notification", "This is the first bundled notification");
             first.setGroupSummary(true).setGroup(KEY_NOTIFICATION_GROUP);
 
-            Notification.Builder second = createNotificationBuider("Second notification", "Here's the second one");
+            NotificationCompat.Builder second = createNotificationBuider("Second notification", "Here's the second one");
             second.setGroup(KEY_NOTIFICATION_GROUP);
 
-            Notification.Builder third = createNotificationBuider("Third notification", "And another for luck!");
+            NotificationCompat.Builder third = createNotificationBuider("Third notification", "And another for luck!");
             third.setGroup(KEY_NOTIFICATION_GROUP);
             third.addAction(replyAction);
             third.addAction(archiveAction);
 
-            Notification.Builder fourth = createNotificationBuider("Fourth notification", "This one sin't a part of our group");
+            NotificationCompat.Builder fourth = createNotificationBuider("Fourth notification", "This one sin't a part of our group");
             fourth.setGroup(KEY_NOTIFICATION_GROUP);
 
-            showNotification(first, 0);
-            showNotification(second, 1);
-            showNotification(third, 2);
-            showNotification(fourth, 3);
+            showNotification(first.build(), 0);
+            showNotification(second.build(), 1);
+            showNotification(third.build(), 2);
+            showNotification(fourth.build(), 3);
         }
     }
 
@@ -160,23 +161,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     getMessageReplyIntent(LABEL_ARCHIVE),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification.Action replyAction =
-                    new Notification.Action.Builder(android.R.drawable.sym_def_app_icon,
+            NotificationCompat.Action replyAction =
+                    new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
                             LABEL_REPLY, replyIntent)
                             .addRemoteInput(remoteInput)
                             .build();
 
-            Notification.Action archiveAction =
-                    new Notification.Action.Builder(android.R.drawable.sym_def_app_icon,
+            NotificationCompat.Action archiveAction =
+                    new NotificationCompat.Action.Builder(android.R.drawable.sym_def_app_icon,
                             LABEL_ARCHIVE, archiveIntent)
                             .build();
 
-            Notification.Builder builder =
+            NotificationCompat.Builder builder =
                     createNotificationBuider("Remote input", "Try typing some text!");
             builder.addAction(replyAction);
             builder.addAction(archiveAction);
 
-            showNotification(builder, REMOTE_INPUT_ID);
+            showNotification(builder.build(), REMOTE_INPUT_ID);
         }
 
 
@@ -189,16 +190,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .putExtra(KEY_PRESSED_ACTION, label);
     }
 
-    private void showNotification(Notification.Builder notification, int id) {
+    private void showNotification(Notification notification, int id) {
         NotificationManager mNotificationManager =
                 (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager!=null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mNotificationManager.notify(id, notification.build());
+        if (mNotificationManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mNotificationManager.notify(id, notification);
         }
     }
 
-    private Notification.Builder createNotificationBuider(String title,String message) {
-        return new Notification.Builder(this)
+    private NotificationCompat.Builder createNotificationBuider(String title, String message) {
+        return new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
                 .setContentTitle(title)
                 .setContentText(message)
