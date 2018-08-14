@@ -1,1 +1,1 @@
-include ':app', ':fingerprintdemo'
+include ':app', ':fingerprintdemo', ':batteryindicator'

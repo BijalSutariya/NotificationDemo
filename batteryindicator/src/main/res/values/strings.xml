@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BatteryIndicator</string>
+    <string name="battery_100">Battery : 100%</string>
+</resources>
