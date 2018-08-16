@@ -12,11 +12,8 @@ import android.view.View;
 
 public class CustomView extends View {
     private int id;
-    private Paint paintBorder, paintFill;
-    private Path pathBorder, pathFill, pathShape;
-    float segmentLength;
-    float deviation;
-    private Rect rect, rectFill;
+    private Paint paintFill;
+    private Path pathFill;
 
 
     public CustomView(Context context) {
@@ -44,9 +41,6 @@ public class CustomView extends View {
         paintFill = new Paint();
         paintFill.setAntiAlias(true);
 
-        paintBorder = new Paint();
-
-        pathBorder = new Path();
         pathFill = new Path();
 
     }

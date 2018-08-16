@@ -2,7 +2,6 @@ package e.matrixhive.customview;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvBattery;
     private Handler handler;
     private Runnable runnable;
+    private int scale;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,11 @@ public class MainActivity extends AppCompatActivity {
 
     public float batteryLevel() {
         Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        int level = 0;
+        if (batteryIntent != null) {
+            level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        }
 
         if (level == -1 || scale == -1) {
             return 50.0f;
